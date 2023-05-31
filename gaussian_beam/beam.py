@@ -39,6 +39,6 @@ class GaussianBeam:
     
     def pass_lens(self, z: float, f: float):
         new_waist = self.waist / np.sqrt(1 + (self.z_R / f)**2)
-        new_z_center = z + f / (1 + (self.z_R / f)**2)
+        new_z_center = z + f / (1 + (f / self.z_R)**2)
         return GaussianBeam(new_z_center, new_waist[0], new_waist[1], self.rotation, self.power, self.wavelength)
     
