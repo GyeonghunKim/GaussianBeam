@@ -33,7 +33,7 @@ class GaussianBeam:
         )
     
     def power_through_aperture(self, z: float, R: float, rough_mode: bool=False):
-        intensity_func = lambda y, x: self.intensity(z)(x, y) * float(x**2 + y**2 < R**2)
+        intensity_func = lambda y, x: self.intensity(z)(x, y) * (x**2 + y**2 < R**2)
         w_z = self.radius_one_over_e_sq(z)
         if rough_mode:
             x_list = np.linspace( -w_z[0] * 10, w_z[0] * 10, 101)
