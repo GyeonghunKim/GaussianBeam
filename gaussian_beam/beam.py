@@ -32,11 +32,18 @@ class GaussianBeam:
                 self.I_0 * (self.waist[0] / w_z[0]) * (self.waist[1] / w_z[1]) * np.exp(-2 * (x**2 / w_z[0]**2 + y**2 / w_z[1]**2))
         )
     
-    def power_through_aperture(self, z: float, R: float):
+    def power_through_aperture(self, z: float, R: float, rough_mode: bool=False):
         intensity_func = lambda y, x: self.intensity(z)(x, y) * float(x**2 + y**2 < R**2)
         w_z = self.radius_one_over_e_sq(z)
-        return dblquad(intensity_func, -w_z[0] * 10, w_z[0] * 10, -w_z[1] * 10, w_z[1] * 10)[0]
-    
+        if rough_mode:
+            x_list = np.linspace( -w_z[0] * 10, w_z[0] * 10, 101)
+            y_list = np.linspace( -w_z[1] * 10, w_z[1] * 10, 101)
+            X, Y = np.meshgrid(x_list, y_list)
+            I = intensity_func(X, Y)
+            return np.sum(I) * (x_list[1] - x_list[0]) * (y_list[1] - y_list[0])
+        else:
+            return dblquad(intensity_func, -w_z[0] * 10, w_z[0] * 10, -w_z[1] * 10, w_z[1] * 10)[0]
+        
     def pass_lens(self, z: float, f: float):
         new_waist = self.waist / np.sqrt(1 + (self.z_R / f)**2)
         new_z_center = z + f / (1 + (f / self.z_R)**2)
