@@ -1,5 +1,7 @@
 import numpy as np
 from scipy.integrate import dblquad
+from .lens import Lens
+
 class GaussianBeam:
     def __init__(self, z_center: float, waist_1: float, waist_2: float, rotation: float, power: float, wavelength: float):
         self.z_center = z_center
@@ -44,8 +46,13 @@ class GaussianBeam:
         else:
             return dblquad(intensity_func, -w_z[0] * 10, w_z[0] * 10, -w_z[1] * 10, w_z[1] * 10)[0]
         
-    def pass_lens(self, z: float, f: float):
-        new_waist = self.waist / np.sqrt(1 + (self.z_R / f)**2)
-        new_z_center = z + f / (1 + (f / self.z_R)**2)
+    def pass_lens(self, lens: Lens):
+        z = lens.z - self.z_center
+        r = self.z_R / (z - lens.f)
+        M_r = np.abs(lens.f / (z - lens.f))
+        M = M_r / np.sqrt(1 + r**2)
+        
+        new_waist = self.waist * M # self.waist / np.sqrt(1 + (self.z_R / lens.f)**2)
+        new_z_center = lens.z + lens.f + M**2 * (z - lens.f) # lens.z + lens.f / (1 + (lens.f / self.z_R)**2)
         return GaussianBeam(new_z_center, new_waist[0], new_waist[1], self.rotation, self.power, self.wavelength)
     
