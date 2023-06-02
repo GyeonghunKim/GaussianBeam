@@ -3,9 +3,9 @@ from numpy.typing import *
 import matplotlib.pyplot as plt
 
 from typing import *
-from .lens import Lens
-from .beam import GaussianBeam
-
+from ..components.lens import Lens
+from ..beam.beam import GaussianBeam
+from ..utils.units import *
 
 class Sequence:
     def __init__(
@@ -16,7 +16,7 @@ class Sequence:
     ):
         self.lens_list = lens_list
         self.z_lens = [z_span[0]] + [lens.z for lens in self.lens_list] + [z_span[1]]
-        if sorted(self.z_lens) != self.z_lens:
+        if (sorted(self.z_lens) != self.z_lens):
             raise ValueError("Lens sequence should be in position order.")
 
         self.beams = [initial_beam]
@@ -40,11 +40,19 @@ class Sequence:
         )
         w_plot = waist_list.reshape((waist_list.shape[0] * waist_list.shape[1], 2))
         z_plot = z_lists.reshape((z_lists.shape[0] * z_lists.shape[1],))
-        ax.plot(z_plot, w_plot, c="r")
-        ax.plot(z_plot, -w_plot, c="r")
+        
+        ax.plot(z_plot / mm, w_plot[:, 0] / mm, c="r", label = 'axis 1')
+        ax.plot(z_plot / mm, -w_plot[:, 0] / mm, c="r")
+
+        ax.plot(z_plot / mm, w_plot[:, 1] / mm, c="b", label = 'axis 2')
+        ax.plot(z_plot / mm, -w_plot[:, 1] / mm, c="b")
+
 
         lens_radi = np.max(w_plot) * 1.2
         for lens in self.lens_list:
-            ax.plot([lens.z, lens.z], [-lens_radi, lens_radi], "--", c="k")
-
+            ax.plot([lens.z/mm, lens.z/mm], [-lens_radi/mm, lens_radi/mm], "--", c="k")
+            
+        ax.legend()
+        ax.set_xlabel('z (mm)')
+        ax.set_ylabel('x, y (mm)')
         return fig, ax

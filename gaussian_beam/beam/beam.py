@@ -1,20 +1,29 @@
 import numpy as np
+from numpy.typing import *
+from typing import *
 from scipy.integrate import dblquad
-from .lens import Lens
+from ..components.lens import Lens
 
 
 class GaussianBeam:
     def __init__(
         self,
-        z_center: float,
-        waist_1: float,
-        waist_2: float,
+        z_center: Union[float, NDArray[np.float64]],
+        waist: Union[float, NDArray[np.float64]],
         rotation: float,
         power: float,
         wavelength: float,
     ):
-        self.z_center = z_center
-        self.waist = np.array([waist_1, waist_2])
+        if isinstance(z_center, float):
+            self.z_center = np.array([z_center, z_center])
+        else:
+            self.z_center = np.array(z_center)
+            
+        if isinstance(waist, float):
+            self.waist = np.array([waist, waist])
+        else:
+            self.waist = np.array(waist)
+            
         self.rotation = rotation
         self.power = power
         self.wavelength = wavelength
@@ -73,8 +82,7 @@ class GaussianBeam:
         )  # lens.z + lens.f / (1 + (lens.f / self.z_R)**2)
         return GaussianBeam(
             new_z_center,
-            new_waist[0],
-            new_waist[1],
+            new_waist,
             self.rotation,
             self.power,
             self.wavelength,
