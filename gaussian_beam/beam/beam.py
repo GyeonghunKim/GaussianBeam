@@ -2,7 +2,7 @@ import numpy as np
 from numpy.typing import *
 from typing import *
 from scipy.integrate import dblquad
-from ..components.lens import Lens
+from ..components.lens import BaseLens
 
 
 class GaussianBeam:
@@ -70,7 +70,7 @@ class GaussianBeam:
                 intensity_func, -w_z[0] * 10, w_z[0] * 10, -w_z[1] * 10, w_z[1] * 10
             )[0]
 
-    def pass_lens(self, lens: Lens):
+    def pass_lens(self, lens: BaseLens):
         z = lens.z - self.z_center
         r = self.z_R / (z - lens.f)
         M_r = np.abs(lens.f / (z - lens.f))

@@ -3,14 +3,14 @@ from numpy.typing import *
 import matplotlib.pyplot as plt
 
 from typing import *
-from ..components.lens import Lens
+from ..components.lens import BaseLens
 from ..beam.beam import GaussianBeam
 from ..utils.units import *
 
 class Sequence:
     def __init__(
         self,
-        lens_list: Iterable[Lens],
+        lens_list: Iterable[BaseLens],
         z_span: Iterable[float],
         initial_beam: GaussianBeam,
     ):
