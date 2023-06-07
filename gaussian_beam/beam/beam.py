@@ -15,7 +15,7 @@ def beam_from_two_point(w_1: float, w_2: float, d: float, wavelength: float):
                 np.sqrt((w_2/w_0)**2 - 1) - np.sqrt((w_1/w_0)**2 - 1)
             )
         ) - d
-    sol = root_scalar(f)
+    sol = root_scalar(f, x0=w_1 * 0.8, x1=w_1 * 0.9)
     w_0 = sol.root
     return GaussianBeam(0, w_0, 0, 1, wavelength)
     
