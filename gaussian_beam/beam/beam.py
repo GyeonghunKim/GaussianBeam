@@ -2,9 +2,24 @@ import numpy as np
 from numpy.typing import *
 from typing import *
 from scipy.integrate import dblquad
+from scipy.optimize import root_scalar
 from ..components.lens import BaseLens
 
-
+def beam_from_two_point(w_1: float, w_2: float, d: float, wavelength: float):
+    if w_1 > w_2:
+        w_1, w_2 = w_2, w_1
+        
+    def f(w_0):
+        return (
+            np.pi * w_0**2/wavelength * (
+                np.sqrt((w_2/w_0)**2 - 1) - np.sqrt((w_1/w_0)**2 - 1)
+            )
+        ) - d
+    sol = root_scalar(f, x0=w_1 * 0.8, )
+    w_0 = sol.root
+    return GaussianBeam(0, w_0, 0, 1, wavelength)
+    
+    
 class GaussianBeam:
     def __init__(
         self,
